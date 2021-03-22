@@ -38,7 +38,6 @@ class NegativeSelection(AIS, ImmuneMemory):
         assert criterion in ['euclidean']
         self.num_detectors = num_detectors
         self.criterion = criterion
-        self.immune_memory = []
 
     def fit(self, X):
         dim = X.shape[1]
@@ -56,6 +55,3 @@ class NegativeSelection(AIS, ImmuneMemory):
                     preds[i] = 1  # fraud
                     continue
         return preds
-
-
-

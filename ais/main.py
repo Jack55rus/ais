@@ -3,9 +3,8 @@ from immune_system import NegativeSelection
 import numpy as np
 
 if __name__ == '__main__':
-    # ags = np.array([[.2, .54], [.76, .29]])
     ags_list = []
-    for i in range(150):
+    for i in range(250):
         ags_list.append([np.random.random(), np.random.random()])
     ags = np.array(ags_list)
     ags_test = np.array([[.65, .45], [.16, .98]])
