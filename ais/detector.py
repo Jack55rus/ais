@@ -4,8 +4,8 @@ from abc import ABCMeta, abstractmethod
 
 
 class Point:
-    def __init__(self, args: np.array):
-        self.coords = args
+    def __init__(self, coords: np.array):
+        self.coords = coords
         self.dim = len(self.coords)
 
     def get_dim(self) -> int:
@@ -15,10 +15,20 @@ class Point:
         return self.coords
 
     def calc_dist_to_other_point(self, other_point: 'Point') -> float:
-        return np.linalg.norm(self.coords - other_point)
+        return np.linalg.norm(self.coords - other_point.get_coords())
 
-    # todo: method to calc dist to multiple points (think over some class for handling this stuff)
-    # def calc_dist_to_multiple_points(self, points: 'Point'):
+    def calc_dist_to_multiple_points(self, other_points: list['Point']):
+        distances = []
+        for point in other_points:
+            distances.append(self.calc_dist_to_other_point(point))
+        return distances
+
+    def find_min_dist_to_multiple_points(self, other_points: list['Point']):
+        return min(self.calc_dist_to_multiple_points(other_points=other_points))
+
+
+# todo: interface for handling various calculations of points and spheres (transfer the above methods)
+# todo: class Antigen for converting original np.array data into list of Points
 
 
 class HyperSphere:
@@ -42,9 +52,11 @@ class HyperSphere:
 
 class RandomParamsGenerator(metaclass=ABCMeta):
     ''' This is a base class for generating random parts of the algorithm '''
+    @abstractmethod
     def __init__(self, *args):
         pass
 
+    @abstractmethod
     def __call__(self, *args):
         pass
 
