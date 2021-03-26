@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from detector import Detector, RandomPointGenerator, RandomHyperSphereGenerator, Point, HyperSphere
 from ais.detector import DistanceCalculator
+import numpy as np
 
 
 class AIS(metaclass=ABCMeta):
@@ -45,7 +46,7 @@ class NegativeSelection(AIS, ImmuneMemory):
         self.num_detectors = num_detectors
         self.criterion = criterion
 
-    def fit(self, X):
+    def fit(self, X: np.ndarray):
         dim = X.shape[1]  # dim of the data
         while self.get_current_memory_size() < self.num_detectors:
             # first, generate a random point
@@ -64,8 +65,21 @@ class NegativeSelection(AIS, ImmuneMemory):
                 detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=None)
                 self.expand_memory(detector)
 
-    def predict(self, X):
-        pass
+    def predict(self, X: np.ndarray) -> np.array:
+        # 0 - normal, 1 = anomaly
+        # for each point in X, go through each detector in memory
+        # if a point falls inside a detector - this is an anomaly
+        # otherwise it is a normal point
+        num_samples = X.shape[0]
+        answers = [0] * num_samples
+        for sample_id in range(num_samples):
+            sample_coords = X[sample_id, :]
+            sample_point = Point(sample_coords)
+            for det in self.memory:
+                if det.is_point_inside(point=sample_point):
+                    answers[sample_id] = 1
+                    break
+        return np.array(answers)
 
 
 

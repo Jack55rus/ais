@@ -10,7 +10,8 @@ if __name__ == '__main__':
     ags_test = np.array([[.65, .45], [.16, .98]])
     nsa = NegativeSelection(num_detectors=350)
     nsa.fit(ags)
-    # preds = nsa.predict(ags_test)
+    preds = nsa.predict(ags_test)
+    print(preds)
     circles = []
     for d in nsa.memory:
         circles.append(plt.Circle((d.center.get_coords()[0], d.center.get_coords()[1]),
