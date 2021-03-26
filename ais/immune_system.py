@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from detector import Detector, RandomPointGenerator, RandomHyperSphereGenerator, Point, HyperSphere
-import numpy as np
+from ais.detector import DistanceCalculator
 
 
 class AIS(metaclass=ABCMeta):
@@ -23,14 +23,17 @@ class ImmuneMemory:
         if self.memory is None:
             self.memory = []
 
-    def expand(self, det: Detector):
+    def expand_memory(self, det: Detector):
         self.memory.append(det)
 
-    def clear(self):
+    def clear_memory(self):
         self.memory = []
 
-    def is_memory_empty(self):
+    def is_memory_empty(self) -> bool:
         return True if len(self.memory) == 0 else False
+
+    def get_current_memory_size(self) -> int:
+        return len(self.memory)
 
 
 class NegativeSelection(AIS, ImmuneMemory):
@@ -43,32 +46,26 @@ class NegativeSelection(AIS, ImmuneMemory):
         self.criterion = criterion
 
     def fit(self, X):
-        # todo: implement things described above
-        '''
-        first, generate a random point
-        second, check if this point is inside an existing Detector
-        if inside -> go back to step 1,
-        otherwise calculate all distances between the candidate and all self's
-        then, find min value among them
-        take this value as a radius for candidate (optionally subtract eps)
-        add dR to the radius (it simulates type I error)
-        '''
-        pass
         dim = X.shape[1]  # dim of the data
-        detector_counter = 0
-        while detector_counter < self.num_detectors:
+        while self.get_current_memory_size() < self.num_detectors:
             # first, generate a random point
             rand_point = RandomPointGenerator(dim=dim)
             candidate_point = rand_point()
-            # candidate = Detector(center=rand_point(), radius=0.0)
+            inside_detector = False
             # second, check if this point is inside the existing Detectors
-            if not self.is_memory_empty():
+            if not self.is_memory_empty():  # if there are detectors in memory
                 for det in self.memory:
                     if det.is_point_inside(point=candidate_point):
-                        break  # if inside -> go back to step 1
+                        inside_detector = True  # if inside -> go back to step 1
             # otherwise calculate all distances between the candidate and all self's ags
-            # ags = np.split(X, X.shape[0], axis=0)
-            # min_dist_to_ag = candidate_point.calc_dist_to_multiple_points()
+            # then, find min value among them
+            if not inside_detector or self.is_memory_empty():
+                min_dist_to_ag = DistanceCalculator.calc_min_dist_between_ags_and_point(ags=X, point=candidate_point)
+                detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=None)
+                self.expand_memory(detector)
+
+    def predict(self, X):
+        pass
 
 
 

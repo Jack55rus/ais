@@ -1,6 +1,7 @@
 import numpy as np
 from math import sqrt
 from abc import ABCMeta, abstractmethod
+from typing import Optional
 
 
 class Point:
@@ -14,40 +15,45 @@ class Point:
     def get_coords(self) -> np.array:
         return self.coords
 
-    def calc_dist_to_other_point(self, other_point: 'Point') -> float:
-        return np.linalg.norm(self.coords - other_point.get_coords())
-
-    def calc_dist_to_multiple_points(self, other_points: list['Point']):
-        distances = []
-        for point in other_points:
-            distances.append(self.calc_dist_to_other_point(point))
-        return distances
-
-    def find_min_dist_to_multiple_points(self, other_points: list['Point']):
-        return min(self.calc_dist_to_multiple_points(other_points=other_points))
-
-
-# todo: interface for handling various calculations of points and spheres (transfer the above methods)
-# todo: class Antigen for converting original np.array data into list of Points
-
 
 class HyperSphere:
-    def __init__(self, coords: Point, radius: float):
-        self.coords = coords
+    def __init__(self, center: Point, radius: float):
+        self.center = center
         self.radius = radius
 
     def get_radius(self) -> float:
         return self.radius
 
     def get_coords(self) -> Point:
-        return self.coords
+        return self.center
 
     def get_params(self) -> tuple[Point, float]:
-        return self.coords, self.radius
+        return self.center, self.radius
 
     def is_point_inside(self, point: Point):
-        distance = self.coords.calc_dist_to_other_point(point)  # distance between center and some point
-        return True if sqrt(distance) < self.radius else False
+        # distance = self.coords.calc_dist_to_other_point(point)  # distance between center and some point
+        distance = DistanceCalculator.calc_dist_between_points(self.center, point)  # distance between center and some point
+        return True if distance < self.radius else False
+
+
+class DistanceCalculator:
+
+    @staticmethod
+    def calc_dist_between_points(point_1: Point, point_2: Point) -> float:
+        assert point_1.get_dim() == point_2.get_dim(), 'dimensionality must be the same'
+        return np.linalg.norm(point_1.get_coords() - point_2.get_coords())
+
+    @classmethod
+    def calc_dist_between_ags_and_point(cls, ags: np.ndarray, point: Point) -> np.ndarray:
+        assert ags.shape[1] == point.get_dim(), 'dimensionality must be the same'
+        point_coord = point.get_coords()
+        point_coord = np.expand_dims(point_coord, axis=0)
+        point_coord_rep = np.repeat(point_coord, ags.shape[0], axis=0)
+        return np.linalg.norm(ags - point_coord_rep, axis=1)
+
+    @classmethod
+    def calc_min_dist_between_ags_and_point(cls, ags: np.ndarray, point: Point) -> float:
+        return np.min(cls.calc_dist_between_ags_and_point(ags, point))
 
 
 class RandomParamsGenerator(metaclass=ABCMeta):
@@ -83,49 +89,15 @@ class RandomHyperSphereGenerator(RandomParamsGenerator):
 
 
 class Detector(HyperSphere):
-    def __init__(self, center: Point, radius: float, eps: float = 1e-8):
+    def __init__(self, center: Point, radius: float, eps: Optional[float] = None):
         HyperSphere.__init__(self, center, radius)
         self.eps = eps
+        self.init_radius()
 
     def change_radius(self, value: float):
+        # not sure if this method can be applied explicitly, but I'll keep for now
         self.radius += value
 
-
-
-
-# class Detector:
-#     def __init__(self, dim):
-#         self.dim = dim  # dimensionality
-#         self.coords = np.random.rand(self.dim)  # define random coords for the Detector
-#         self.radius = np.random.random()  # do the same for its radius
-#         self.eps = 1e-8  # how much detector radius is less than the minimum dist to ag
-#         # add range for params later
-#
-#     def get_params(self):
-#         return self.radius, self.coords
-#
-#     def is_ag_inside(self, ag):
-#         '''
-#         Checks if an antigen is inside the detector
-#         :param ag: np.array (dim,)
-#         :return: True if point inside, False otherwise
-#         '''
-#         distance = np.linalg.norm(self.coords - ag)
-#         return True if sqrt(distance) < self.radius else False
-#
-#     def ag_distance(self, ag: np.array) -> float:
-#         '''
-#         Computes distance between an antigen and a center of the detector
-#         :param ag:
-#         :return:
-#         '''
-#         return np.linalg.norm(self.coords - ag)
-#
-#     def min_ag_dist(self, ags):
-#         unsqueezed_coords = np.expand_dims(self.coords, axis=0)
-#         repeated_coords = np.repeat(unsqueezed_coords, ags.shape[0], axis=0)
-#         min_dist = min(np.linalg.norm(ags - repeated_coords, axis=1))
-#         return min_dist
-#
-#     def change_radius(self, ags):
-#         self.radius = self.min_ag_dist(ags) - self.eps
+    def init_radius(self):
+        if self.eps is not None:
+            self.change_radius(self.eps)
