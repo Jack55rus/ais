@@ -39,12 +39,13 @@ class ImmuneMemory:
 
 class NegativeSelection(AIS, ImmuneMemory):
 
-    def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None):
+    def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None, eps=None):
         AIS.__init__(self)
         ImmuneMemory.__init__(self, init_memory)
         assert criterion in ['euclidean']
         self.num_detectors = num_detectors
         self.criterion = criterion
+        self.eps = eps
 
     def fit(self, X: np.ndarray):
         dim = X.shape[1]  # dim of the data
@@ -62,8 +63,9 @@ class NegativeSelection(AIS, ImmuneMemory):
             # then, find min value among them
             if not inside_detector or self.is_memory_empty():
                 min_dist_to_ag = DistanceCalculator.calc_min_dist_between_ags_and_point(ags=X, point=candidate_point)
-                detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=None)
+                detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=self.eps)
                 self.expand_memory(detector)
+            print(self.get_current_memory_size())
 
     def predict(self, X: np.ndarray) -> np.array:
         # 0 - normal, 1 = anomaly
