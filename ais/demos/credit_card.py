@@ -3,6 +3,7 @@ from sklearn.preprocessing import MinMaxScaler
 from immune_system import NegativeSelection
 import numpy as np
 
+# todo: get rid of local paths
 
 def credit_card():
     np.random.seed(3)
