@@ -5,6 +5,7 @@ import numpy as np
 
 # todo: get rid of local paths
 
+
 def credit_card():
     np.random.seed(3)
     # load whole dataset
@@ -64,34 +65,7 @@ def speech():
     # print(np.argwhere(labels > 0).tolist())
     # print(np.where(labels == 0)[0])
 
-def mnist():
-    digit = 8
-    scaler = MinMaxScaler()
-    mnist_train = pd.read_csv('../data/mnist_train.csv')
-    train_set = mnist_train.loc[mnist_train.label != digit]
-    train_set = np.array(train_set.iloc[:, 1:]) / 255 + 0.25  # normalize
-    random_indices = np.random.permutation(len(train_set))
-    train_set = train_set[random_indices]
-    train_set = scaler.fit_transform(train_set)
-
-    mnist_test = pd.read_csv('../data/mnist_test.csv')
-    mnist_test_not_digit = mnist_test.loc[mnist_test.label != digit]
-    mnist_test_not_digit = np.array(mnist_test_not_digit.iloc[:, 1:]) / 255
-    mnist_test_not_digit = scaler.fit_transform(mnist_test_not_digit)
-
-    mnist_test_digit = mnist_test.loc[mnist_test.label == digit]
-    mnist_test_digit = np.array(mnist_test_digit.iloc[:, 1:]) / 255
-    mnist_test_digit = scaler.fit_transform(mnist_test_digit)
-
-    nsa = NegativeSelection(num_detectors=200)
-    nsa.fit(train_set)
-    ans_not_digit = nsa.predict(mnist_test_not_digit)
-    ans_digit = nsa.predict(mnist_test_digit)
-
-    print('number of 1 preds on normal data: {} out of {} samples'.format(np.sum(ans_not_digit), ans_not_digit.shape[0]))
-    print('number of 1 preds on abnormal data: {} out of {} samples'.format(np.sum(ans_digit), ans_digit.shape[0]))
 
 if __name__ == '__main__':
     credit_card()
     # speech()
-    # mnist()
