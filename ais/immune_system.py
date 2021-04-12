@@ -39,13 +39,15 @@ class ImmuneMemory:
 
 class NegativeSelection(AIS, ImmuneMemory):
 
-    def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None):
+    def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None, eps=None):
         AIS.__init__(self)
         ImmuneMemory.__init__(self, init_memory)
         assert criterion in ['euclidean']
         self.num_detectors = num_detectors
         self.criterion = criterion
+        self.eps = eps
 
+    # noinspection PyPep8Naming
     def fit(self, X: np.ndarray):
         dim = X.shape[1]  # dim of the data
         while self.get_current_memory_size() < self.num_detectors:
@@ -62,8 +64,13 @@ class NegativeSelection(AIS, ImmuneMemory):
             # then, find min value among them
             if not inside_detector or self.is_memory_empty():
                 min_dist_to_ag = DistanceCalculator.calc_min_dist_between_ags_and_point(ags=X, point=candidate_point)
-                detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=None)
-                self.expand_memory(detector)
+                detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=self.eps)
+                if self.eps is not None and min_dist_to_ag - self.eps > 0:
+                    self.expand_memory(detector)
+                elif self.eps is None:
+                    self.expand_memory(detector)
+
+            print(self.get_current_memory_size())
 
     def predict(self, X: np.ndarray) -> np.array:
         # 0 - normal, 1 = anomaly
@@ -80,33 +87,3 @@ class NegativeSelection(AIS, ImmuneMemory):
                     answers[sample_id] = 1
                     break
         return np.array(answers)
-
-
-
-
-
-# class NegativeSelection(AIS, ImmuneMemory):
-#
-#     def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None):
-#         AIS.__init__(self)
-#         ImmuneMemory.__init__(self, init_memory)
-#         assert criterion in ['euclidean']
-#         self.num_detectors = num_detectors
-#         self.criterion = criterion
-#
-#     def fit(self, X):
-#         dim = X.shape[1]
-#         for det_num in range(self.num_detectors):
-#             det = Detector(dim=dim)
-#             det.change_radius(X)
-#             if det.get_params()[0] > 0:
-#                 self.expand(det)
-#
-#     def predict(self, X):
-#         preds = np.zeros(shape=X.shape[0], dtype=np.uint8)
-#         for i, ag in enumerate(X):
-#             for detector in self.memory:
-#                 if detector.is_ag_inside(ag):  # if inside detector
-#                     preds[i] = 1  # fraud
-#                     continue
-#         return preds
