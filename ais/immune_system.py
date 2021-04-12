@@ -47,6 +47,7 @@ class NegativeSelection(AIS, ImmuneMemory):
         self.criterion = criterion
         self.eps = eps
 
+    # noinspection PyPep8Naming
     def fit(self, X: np.ndarray):
         dim = X.shape[1]  # dim of the data
         while self.get_current_memory_size() < self.num_detectors:
@@ -64,7 +65,11 @@ class NegativeSelection(AIS, ImmuneMemory):
             if not inside_detector or self.is_memory_empty():
                 min_dist_to_ag = DistanceCalculator.calc_min_dist_between_ags_and_point(ags=X, point=candidate_point)
                 detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=self.eps)
-                self.expand_memory(detector)
+                if self.eps is not None and min_dist_to_ag - self.eps > 0:
+                    self.expand_memory(detector)
+                elif self.eps is None:
+                    self.expand_memory(detector)
+
             print(self.get_current_memory_size())
 
     def predict(self, X: np.ndarray) -> np.array:
