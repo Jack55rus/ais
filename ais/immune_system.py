@@ -87,33 +87,3 @@ class NegativeSelection(AIS, ImmuneMemory):
                     answers[sample_id] = 1
                     break
         return np.array(answers)
-
-
-
-
-
-# class NegativeSelection(AIS, ImmuneMemory):
-#
-#     def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None):
-#         AIS.__init__(self)
-#         ImmuneMemory.__init__(self, init_memory)
-#         assert criterion in ['euclidean']
-#         self.num_detectors = num_detectors
-#         self.criterion = criterion
-#
-#     def fit(self, X):
-#         dim = X.shape[1]
-#         for det_num in range(self.num_detectors):
-#             det = Detector(dim=dim)
-#             det.change_radius(X)
-#             if det.get_params()[0] > 0:
-#                 self.expand(det)
-#
-#     def predict(self, X):
-#         preds = np.zeros(shape=X.shape[0], dtype=np.uint8)
-#         for i, ag in enumerate(X):
-#             for detector in self.memory:
-#                 if detector.is_ag_inside(ag):  # if inside detector
-#                     preds[i] = 1  # fraud
-#                     continue
-#         return preds
