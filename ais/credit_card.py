@@ -65,7 +65,27 @@ def speech():
     # print(np.argwhere(labels > 0).tolist())
     # print(np.where(labels == 0)[0])
 
+def zindi_insurance():
+    np.random.seed(3)
+    train_df = pd.read_csv('../data/proc_train_insurance.csv')
+    norm_df = train_df.loc[train_df.target == 0]
+    norm_df = norm_df.drop(columns=['target'])
+
+    abnorm_df = train_df.loc[train_df.target == 1]
+    abnorm_df = abnorm_df.drop(columns=['target'])
+
+    scaler = MinMaxScaler()
+    norm_df = scaler.fit_transform(norm_df)
+    abnorm_df = scaler.fit_transform(abnorm_df)
+
+    nsa = NegativeSelection(num_detectors=350)
+    nsa.fit(norm_df)
+    ans = nsa.predict(abnorm_df)
+    print('number of 1 preds: {} out of {} samples'.format(np.sum(ans), abnorm_df.shape[0]))
+
+
 
 if __name__ == '__main__':
-    credit_card()
+    # credit_card()
     # speech()
+    zindi_insurance()
