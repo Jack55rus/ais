@@ -46,5 +46,5 @@ repos:
   - id: flake8
     ais/main:
       py:
-    files: ^(videoanal|tests)
+    files: ^(ais|tests)
     args: [--config, ais/.flake8]
