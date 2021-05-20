@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from detector import Detector, RandomPointGenerator, RandomHyperSphereGenerator, Point, HyperSphere
-from ais.detector import DistanceCalculator
+from detector import DistanceCalculator
 import numpy as np
+from tqdm import tqdm
 
 
 class AIS(metaclass=ABCMeta):
@@ -50,9 +51,11 @@ class NegativeSelection(AIS, ImmuneMemory):
     # noinspection PyPep8Naming
     def fit(self, X: np.ndarray):
         dim = X.shape[1]  # dim of the data
+        lower_boundary = X.min(axis=0, keepdims=True)
+        upper_boundary = X.max(axis=0, keepdims=True)
         while self.get_current_memory_size() < self.num_detectors:
             # first, generate a random point
-            rand_point = RandomPointGenerator(dim=dim)
+            rand_point = RandomPointGenerator(dim=dim, low=lower_boundary, high=upper_boundary)
             candidate_point = rand_point()
             inside_detector = False
             # second, check if this point is inside the existing Detectors
@@ -79,7 +82,7 @@ class NegativeSelection(AIS, ImmuneMemory):
         # otherwise it is a normal point
         num_samples = X.shape[0]
         answers = [0] * num_samples
-        for sample_id in range(num_samples):
+        for sample_id in tqdm(range(num_samples)):
             sample_coords = X[sample_id, :]
             sample_point = Point(sample_coords)
             for det in self.memory:
