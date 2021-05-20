@@ -3,12 +3,13 @@ import pandas as pd
 from immune_system import NegativeSelection
 from sklearn.preprocessing import MinMaxScaler
 
+from ais.config import CommonConfig
+
 
 def credit_card():
     np.random.seed(3)
     # load whole dataset
-    df = pd.read_csv("../data/creditcard.csv")
-
+    df = pd.read_csv(CommonConfig.data_dir / "creditcard.csv")
     # split into normal and abnormal
     norm_df = df.loc[df.Class == 0]
     norm_df = norm_df.drop(columns=["Time", "Class"])
