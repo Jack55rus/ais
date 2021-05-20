@@ -37,55 +37,6 @@ def credit_card():
     print('number of 1 preds: {} out of {} samples'.format(np.sum(ans), abnorm_df.shape[0]))
 
 
-def speech():
-    feat = np.load('../data/features.npy')
-    labels = np.load('../data/labels.npy')
-
-    norm_inds = np.where(labels == 0)[0]
-    anom_inds = np.where(labels == 1)[0]
-
-    scaler = MinMaxScaler()
-
-    feat = scaler.fit_transform(feat)
-    test_size = int(len(norm_inds) * 0.05)
-    feat_train_norm = feat[norm_inds][test_size:, :]
-    feat_test_norm = feat[norm_inds][:test_size, :]
-    feat_test_anom = feat[anom_inds]
-
-    nsa = NegativeSelection(num_detectors=2500, eps=0.0)
-    nsa.fit(feat_train_norm)
-    # feed abnormal to predict
-    ans = nsa.predict(feat_test_anom)
-    print('number of 1 preds: {} out of {} samples'.format(np.sum(nsa.predict(feat_test_norm)), feat_test_norm.shape[0]))
-    print('number of 1 preds: {} out of {} samples'.format(np.sum(ans), feat_test_anom.shape[0]))
-
-
-    # print(labels[np.argwhere(labels > 0)])
-    # print(labels[np.nonzero(labels)])
-    # print(np.argwhere(labels > 0).tolist())
-    # print(np.where(labels == 0)[0])
-
-def zindi_insurance():
-    np.random.seed(3)
-    train_df = pd.read_csv('../data/proc_train_insurance.csv')
-    norm_df = train_df.loc[train_df.target == 0]
-    norm_df = norm_df.drop(columns=['target'])
-
-    abnorm_df = train_df.loc[train_df.target == 1]
-    abnorm_df = abnorm_df.drop(columns=['target'])
-
-    scaler = MinMaxScaler()
-    norm_df = scaler.fit_transform(norm_df)
-    abnorm_df = scaler.fit_transform(abnorm_df)
-
-    nsa = NegativeSelection(num_detectors=350)
-    nsa.fit(norm_df)
-    ans = nsa.predict(abnorm_df)
-    print('number of 1 preds: {} out of {} samples'.format(np.sum(ans), abnorm_df.shape[0]))
-
-
-
 if __name__ == '__main__':
-    # credit_card()
-    # speech()
-    zindi_insurance()
+    credit_card()
+
