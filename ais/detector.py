@@ -68,12 +68,15 @@ class RandomParamsGenerator(metaclass=ABCMeta):
 
 
 class RandomPointGenerator(RandomParamsGenerator):
-    def __init__(self, dim):
+    def __init__(self, dim, low, high):
         RandomParamsGenerator.__init__(self)
         self.dim = dim
+        self.low = low
+        self.high = high
 
     def __call__(self) -> Point:
-        return Point(np.random.rand(self.dim).flatten())
+        # return Point(np.random.rand(self.dim).flatten())
+        return Point(np.random.uniform(low=self.low, high=self.high).flatten())
 
 
 class RandomHyperSphereGenerator(RandomParamsGenerator):
