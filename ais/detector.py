@@ -1,7 +1,7 @@
-import numpy as np
-from math import sqrt
 from abc import ABCMeta, abstractmethod
 from typing import Optional
+
+import numpy as np
 
 
 class Point:
@@ -32,20 +32,21 @@ class HyperSphere:
 
     def is_point_inside(self, point: Point):
         # distance = self.coords.calc_dist_to_other_point(point)  # distance between center and some point
-        distance = DistanceCalculator.calc_dist_between_points(self.center, point)  # distance between center and some point
+        distance = DistanceCalculator.calc_dist_between_points(
+            self.center, point
+        )  # distance between center and some point
         return True if distance < self.radius else False
 
 
 class DistanceCalculator:
-
     @staticmethod
     def calc_dist_between_points(point_1: Point, point_2: Point) -> float:
-        assert point_1.get_dim() == point_2.get_dim(), 'dimensionality must be the same'
+        assert point_1.get_dim() == point_2.get_dim(), "dimensionality must be the same"
         return np.linalg.norm(point_1.get_coords() - point_2.get_coords())
 
     @classmethod
     def calc_dist_between_ags_and_point(cls, ags: np.ndarray, point: Point) -> np.ndarray:
-        assert ags.shape[1] == point.get_dim(), 'dimensionality must be the same'
+        assert ags.shape[1] == point.get_dim(), "dimensionality must be the same"
         point_coord = point.get_coords()
         point_coord = np.expand_dims(point_coord, axis=0)
         point_coord_rep = np.repeat(point_coord, ags.shape[0], axis=0)
@@ -57,7 +58,8 @@ class DistanceCalculator:
 
 
 class RandomParamsGenerator(metaclass=ABCMeta):
-    ''' This is a base class for generating random parts of the algorithm '''
+    """ This is a base class for generating random parts of the algorithm """
+
     @abstractmethod
     def __init__(self, *args):
         pass

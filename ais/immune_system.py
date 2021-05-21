@@ -1,12 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from detector import Detector, RandomPointGenerator, RandomHyperSphereGenerator, Point, HyperSphere
-from detector import DistanceCalculator
+
 import numpy as np
+from detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 from tqdm import tqdm
 
 
 class AIS(metaclass=ABCMeta):
-
     @abstractmethod
     def fit(self, X):
         pass
@@ -39,11 +38,10 @@ class ImmuneMemory:
 
 
 class NegativeSelection(AIS, ImmuneMemory):
-
-    def __init__(self, num_detectors=10, criterion='euclidean', init_memory=None, eps=None):
+    def __init__(self, num_detectors=10, criterion="euclidean", init_memory=None, eps=None):
         AIS.__init__(self)
         ImmuneMemory.__init__(self, init_memory)
-        assert criterion in ['euclidean']
+        assert criterion in ["euclidean"]
         self.num_detectors = num_detectors
         self.criterion = criterion
         self.eps = eps
