@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
+from typing import Any
 
 import numpy as np
 from detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 from tqdm import tqdm
+from utils.input_check import array_like_check, nan_check
 
 
 class AIS(metaclass=ABCMeta):
@@ -47,7 +49,9 @@ class NegativeSelection(AIS, ImmuneMemory):
         self.eps = eps
 
     # noinspection PyPep8Naming
-    def fit(self, X: np.ndarray):
+    def fit(self, X: Any):
+        array_like_check(X)
+        X = nan_check(X)
         dim = X.shape[1]  # dim of the data
         lower_boundary = X.min(axis=0, keepdims=True)
         upper_boundary = X.max(axis=0, keepdims=True)
@@ -73,11 +77,13 @@ class NegativeSelection(AIS, ImmuneMemory):
 
             print(self.get_current_memory_size())
 
-    def predict(self, X: np.ndarray) -> np.array:
+    def predict(self, X: Any) -> np.array:
         # 0 - normal, 1 = anomaly
         # for each point in X, go through each detector in memory
         # if a point falls inside a detector - this is an anomaly
         # otherwise it is a normal point
+        array_like_check(X)
+        X = nan_check(X)
         num_samples = X.shape[0]
         answers = [0] * num_samples
         for sample_id in tqdm(range(num_samples)):
