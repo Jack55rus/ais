@@ -3,13 +3,8 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
 from ais.config import CommonConfig
-from ais.immune_system import NegativeSelection
+from ais.immune_tools.immune_system import NegativeSelection
 
-# todo: handle any array-like input or dataframe; throw exceptions if not array-like
-# account for nans in df, not array-like, something other than float or int, dimensionality (impl. through assert)
-# todo: check dimensions; handle missing values and stuff like that
-# todo: look at how it's implemented in sklearn
-# todo: verbosity aka progressbar
 # todo: multiprocessing
 
 

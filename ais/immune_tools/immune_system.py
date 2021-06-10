@@ -4,7 +4,8 @@ from typing import Any
 import numpy as np
 from detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 from tqdm import tqdm
-from utils.input_check import array_like_check, nan_check
+
+from ais.utils.input_check import array_like_check, nan_check
 
 
 class AIS(metaclass=ABCMeta):
@@ -55,6 +56,7 @@ class NegativeSelection(AIS, ImmuneMemory):
         dim = X.shape[1]  # dim of the data
         lower_boundary = X.min(axis=0, keepdims=True)
         upper_boundary = X.max(axis=0, keepdims=True)
+        pbar = tqdm(total=self.num_detectors, desc="Training progress")
         while self.get_current_memory_size() < self.num_detectors:
             # first, generate a random point
             rand_point = RandomPointGenerator(dim=dim, low=lower_boundary, high=upper_boundary)
@@ -72,10 +74,11 @@ class NegativeSelection(AIS, ImmuneMemory):
                 detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=self.eps)
                 if self.eps is not None and min_dist_to_ag - self.eps > 0:
                     self.expand_memory(detector)
+                    pbar.update(1)
                 elif self.eps is None:
                     self.expand_memory(detector)
-
-            print(self.get_current_memory_size())
+                    pbar.update(1)
+        pbar.close()
 
     def predict(self, X: Any) -> np.array:
         # 0 - normal, 1 = anomaly
@@ -86,7 +89,7 @@ class NegativeSelection(AIS, ImmuneMemory):
         X = nan_check(X)
         num_samples = X.shape[0]
         answers = [0] * num_samples
-        for sample_id in tqdm(range(num_samples)):
+        for sample_id in tqdm(range(num_samples), desc="Test progress"):
             sample_coords = X[sample_id, :]
             sample_point = Point(sample_coords)
             for det in self.memory:
