@@ -2,9 +2,14 @@ from abc import ABCMeta, abstractmethod
 from typing import Any
 
 import numpy as np
-from detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 from tqdm import tqdm
 
+from ais.immune_tools.detector import (
+    Detector,
+    DistanceCalculator,
+    Point,
+    RandomPointGenerator,
+)
 from ais.utils.input_check import array_like_check, nan_check
 
 
