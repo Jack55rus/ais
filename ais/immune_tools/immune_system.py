@@ -1,5 +1,7 @@
+import pickle
 from abc import ABCMeta, abstractmethod
-from typing import Any
+from pathlib import Path
+from typing import Any, Union
 
 import numpy as np
 from tqdm import tqdm
@@ -84,6 +86,14 @@ class NegativeSelection(AIS, ImmuneMemory):
                     self.expand_memory(detector)
                     pbar.update(1)
         pbar.close()
+
+    def save_model(self, filename: Union[str, Path]):
+        with open(str(filename), "wb") as fout:
+            pickle.dump(self.memory, fout)
+
+    def load_model(self, filename: Union[str, Path]):
+        with open(str(filename), "rb") as fin:
+            self.memory = pickle.load(fin)
 
     def predict(self, X: Any) -> np.array:
         # 0 - normal, 1 = anomaly

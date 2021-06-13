@@ -6,6 +6,7 @@ from ais.config import CommonConfig
 from ais.immune_tools.immune_system import NegativeSelection
 
 # todo: multiprocessing
+# todo: additional stoppage criterion
 
 
 def credit_card():
@@ -32,6 +33,8 @@ def credit_card():
     # feed normal to NS
     nsa = NegativeSelection(num_detectors=350)
     nsa.fit(norm_df_train)
+    # nsa.save_model(CommonConfig.data_dir / 'model.pkl')
+    # nsa.load_model(CommonConfig.data_dir / "model.pkl")
     # feed abnormal to predict
     ans = nsa.predict(abnorm_df)
     print("number of 1 preds: {} out of {} samples".format(np.sum(nsa.predict(norm_df_test)), norm_df_test.shape[0]))
