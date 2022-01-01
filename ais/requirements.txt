@@ -1,5 +1,8 @@
 numpy==1.20.0
 pandas==1.2.3
+pytest==6.2.2
+pytest-env==0.6.2
+pytest-mock==3.6.1
 scikit-learn==0.24.1
 torch==1.8.1
 tqdm==4.60.0
