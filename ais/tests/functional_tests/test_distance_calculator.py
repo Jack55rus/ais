@@ -12,7 +12,6 @@ def test_dist_between_points():
 def test_dist_between_ags_and_point():
     ags = np.array([[1.0, 1.0], [2, 2.0]])
     p = Point(coords=np.array([1.0, 2.0]))
-    print(DistanceCalculator.calc_dist_between_ags_and_point(ags=ags, point=p))
     assert np.all(DistanceCalculator.calc_dist_between_ags_and_point(ags=ags, point=p) == np.array([1.0, 1.0]))
 
 
