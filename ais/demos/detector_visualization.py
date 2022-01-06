@@ -4,6 +4,7 @@ import numpy as np
 from ais.immune_tools.immune_system import NegativeSelection
 
 if __name__ == "__main__":
+    # this demo creates random anti genes and fits negative selection algo to this data
     np.random.seed(42)
     ags_list = []
     for i in range(250):
