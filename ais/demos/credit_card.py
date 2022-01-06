@@ -7,6 +7,7 @@ from ais.immune_tools.immune_system import NegativeSelection
 
 
 def credit_card():
+    # download csv file from https://www.kaggle.com/mlg-ulb/creditcardfraud
     np.random.seed(3)
     # load whole dataset
     df = pd.read_csv(CommonConfig.data_dir / "creditcard.csv")
