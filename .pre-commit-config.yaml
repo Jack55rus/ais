@@ -22,6 +22,14 @@ repos:
   - id: requirements-txt-fixer
 
 
+# autodelete unused imports
+- repo: https://github.com/hadialqattan/pycln
+  rev: v1.1.0
+  hooks:
+    - id: pycln
+      args: [ --all ]
+
+
 # autoformat code with black formatter
 - repo: https://github.com/psf/black
   rev: 20.8b1
@@ -44,6 +52,5 @@ repos:
   rev: 3.8.4
   hooks:
   - id: flake8
-    additional_dependencies: [flake8-isort==4.0.0, flake8-quotes==3.0.0, flake8-print==3.1.4]
     files: ^(ais|tests)
     args: [--config, ais/.flake8]

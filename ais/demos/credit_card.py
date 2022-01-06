@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-from immune_system import NegativeSelection
 from sklearn.preprocessing import MinMaxScaler
 
 from ais.config import CommonConfig
+from ais.immune_tools.immune_system import NegativeSelection
 
 
 def credit_card():

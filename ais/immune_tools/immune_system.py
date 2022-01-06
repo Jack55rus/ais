@@ -1,8 +1,9 @@
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
-from detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 from tqdm import tqdm
+
+from ais.detector import Detector, DistanceCalculator, Point, RandomPointGenerator
 
 
 class AIS(metaclass=ABCMeta):
