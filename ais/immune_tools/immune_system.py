@@ -49,6 +49,7 @@ class NegativeSelection(AIS, ImmuneMemory):
 
     # noinspection PyPep8Naming
     def fit(self, X: np.ndarray):
+        pbar = tqdm(total=self.num_detectors)
         dim = X.shape[1]  # dim of the data
         lower_boundary = X.min(axis=0, keepdims=True)
         upper_boundary = X.max(axis=0, keepdims=True)
@@ -69,10 +70,11 @@ class NegativeSelection(AIS, ImmuneMemory):
                 detector = Detector(center=candidate_point, radius=min_dist_to_ag, eps=self.eps)
                 if self.eps is not None and min_dist_to_ag - self.eps > 0:
                     self.expand_memory(detector)
+                    pbar.update(1)
                 elif self.eps is None:
                     self.expand_memory(detector)
-
-            print(self.get_current_memory_size())
+                    pbar.update(1)
+        pbar.close()
 
     def predict(self, X: np.ndarray) -> np.array:
         # 0 - normal, 1 = anomaly
